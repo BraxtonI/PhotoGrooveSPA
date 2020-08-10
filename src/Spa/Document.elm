@@ -6,6 +6,7 @@ module Spa.Document exposing
 
 import Browser
 import Element exposing (..)
+import UI
 
 
 type alias Document msg =
@@ -25,7 +26,7 @@ toBrowserDocument : Document msg -> Browser.Document msg
 toBrowserDocument doc =
     { title = doc.title
     , body =
-        [ Element.layout [ width fill, height fill ]
+        [ Element.layout UI.body
             (column [ width fill, height fill ] doc.body)
         ]
     }

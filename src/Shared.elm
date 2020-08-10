@@ -11,9 +11,11 @@ module Shared exposing
 import Browser.Navigation exposing (Key)
 import Element exposing (..)
 import Element.Font as Font
+import Element.Region as Region
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 import Url exposing (Url)
+import UI
 
 
 
@@ -66,14 +68,50 @@ view :
     -> Model
     -> Document msg
 view { page, toMsg } model =
+    let
+        navLink : Route.Route -> String -> Element msg
+        navLink url label =
+            link
+                (UI.nav (isActive url page.title))
+                { url = Route.toString url
+                , label = text label
+                }
+    in
     { title = page.title
     , body =
-        [ column [ padding 20, spacing 20, height fill ]
-            [ row [ spacing 20 ]
-                [ link [ Font.color (rgb 0 0.25 0.5), Font.underline ] { url = Route.toString Route.Top, label = text "Homepage" }
-                , link [ Font.color (rgb 0 0.25 0.5), Font.underline ] { url = Route.toString Route.NotFound, label = text "Not found" }
+        [ column
+            [ height fill, width fill ]
+            [ row
+                [ Region.navigation ]
+                [ el
+                    UI.h1
+                    (text "Photo Groove")
+                , navLink Route.PhotoFolders "Photo Folders"
+                , navLink Route.PhotoGallery "Photo Gallery"
                 ]
-            , column [ height fill ] page.body
+            , column
+                []
+                page.body
+            , el
+                UI.footer
+                (text "One is never alone with a rubber duck. -Douglas Adams")
             ]
         ]
     }
+
+
+isActive : Route.Route -> String -> Bool
+isActive link page =
+    case ( link, page ) of
+
+        ( Route.PhotoFolders , "Photo Folders" ) -> True
+
+        ( Route.PhotoFolders , _               ) -> False
+
+        ( Route.PhotoGallery , "Photo Gallery" ) -> True
+
+        ( Route.PhotoGallery , _               ) -> False
+
+        ( Route.Top          , _               ) -> False
+
+        ( _                  , _               ) -> False
