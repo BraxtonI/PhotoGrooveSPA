@@ -6,15 +6,17 @@ module Shared exposing
     , subscriptions
     , update
     , view
+    , urlPrefix
+    , Photo
     )
 
-import Browser.Navigation exposing (Key)
-import Element exposing (..)
-import Element.Font as Font
-import Element.Region as Region
-import Spa.Document exposing (Document)
-import Spa.Generated.Route as Route
-import Url exposing (Url)
+import Browser.Navigation   exposing (Key)
+import Element              exposing (..)
+import Element.Region       as Region
+import Dict                 exposing (Dict)
+import Spa.Document         exposing (Document)
+import Spa.Generated.Route  as Route
+import Url                  exposing (Url)
 import UI
 
 
@@ -27,16 +29,36 @@ type alias Flags =
 
 
 type alias Model =
-    { url : Url
-    , key : Key
+    { url                     : Url
+    , key                     : Key
+    , foldersSelectedFilename : Maybe String
     }
 
 
 init : Flags -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model url key
+    let
+        selectedFilename : Maybe String
+        selectedFilename =
+            Nothing
+
+    in
+    ( Model url key selectedFilename
     , Cmd.none
     )
+
+
+urlPrefix : String
+urlPrefix =
+    "http://elm-in-action.com/"
+
+
+type alias Photo =
+    { title       : String
+    , url         : String
+    , size        : Int
+    , relatedUrls : List String
+    }
 
 
 
