@@ -1,6 +1,6 @@
 module Pages.PhotoFolders exposing (Params, Model, Msg, page)
 
-import Api.Folder           exposing (Folder)
+import Api.Folder           exposing (Folder (..))
 import Dict                 exposing (Dict)
 import Element              exposing (..)
 import Element.Events       as Events
