@@ -1,5 +1,6 @@
 module Pages.PhotoFolders exposing (Params, Model, Msg, page)
 
+import Api.Folder           exposing (Folder)
 import Dict                 exposing (Dict)
 import Element              exposing (..)
 import Element.Events       as Events
@@ -38,15 +39,6 @@ type alias Model =
     , photos           : Dict String Photo
     , root             : Folder
     }
-
-
-type Folder
-    = Folder
-        { name       : String
-        , photoUrls  : List String
-        , subfolders : List Folder
-        , expanded   : Bool
-        }
 
 
 initialModel : Model

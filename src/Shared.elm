@@ -10,6 +10,7 @@ module Shared exposing
     , Photo
     )
 
+import Api.Folder           exposing (Folder)
 import Browser.Navigation   exposing (Key)
 import Element              exposing (..)
 import Element.Region       as Region
