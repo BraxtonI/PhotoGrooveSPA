@@ -1,16 +1,16 @@
 module Pages.PhotoFolders exposing (Params, Model, Msg, page)
 
-import Api.Folder           exposing (Folder (..))
-import Dict                 exposing (Dict)
-import Element              exposing (..)
-import Element.Events       as Events
+import Api.Folder       exposing (Folder (..), modelDecoder)
+import Api.Photo        exposing (Photo)
+import Dict             exposing (Dict)
+import Element          exposing (..)
+import Element.Events   as Events
 import Http
-import Json.Decode          as Decode exposing (Decoder, int, list, string)
-import Json.Decode.Pipeline exposing (required)
-import Shared               exposing (Photo, urlPrefix)
-import Spa.Document         exposing (Document)
-import Spa.Page             as Page exposing (Page)
-import Spa.Url              as Url exposing (Url)
+import Json.Decode      as Decode exposing (Decoder)
+import Shared           exposing (urlPrefix)
+import Spa.Document     exposing (Document)
+import Spa.Page         as Page exposing (Page)
+import Spa.Url          as Url exposing (Url)
 import UI
 
 
@@ -41,28 +41,22 @@ type alias Model =
     }
 
 
-initialModel : Model
-initialModel =
-    { selectedPhotoUrl = Nothing
-    , photos           = Dict.empty
-    , root             =
-        Folder
-            { name       = "Loading..."
-            , expanded   = True
-            , photoUrls  = []
-            , subfolders = []
-            }
-    }
-
-
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared { params } =
-    ( { initialModel | selectedPhotoUrl = shared.foldersSelectedFilename }
-    , Http.get
-        { url = "http://elm-in-action.com/folders/list"
-        , expect = Http.expectJson LoadPage modelDecoder
-        }
-    )
+    let
+        initialModel =
+            Api.Folder.initialModel
+
+    in
+    if shared.foldersModel == initialModel then
+        ( initialModel
+        , Http.get
+            { url = "http://elm-in-action.com/folders/list"
+            , expect = Http.expectJson LoadPage modelDecoder
+            }
+        )
+    else
+        ( shared.foldersModel, Cmd.none )
 
 
 
@@ -275,85 +269,3 @@ toggleExpanded path (Folder folder) =
                         currentSubfolder
             in
             Folder { folder | subfolders = subfolders }
-
-
-type alias JsonPhoto =
-    { title       : String
-    , size        : Int
-    , relatedUrls : List String
-    }
-
-
-jsonPhotoDecoder : Decoder JsonPhoto
-jsonPhotoDecoder =
-    Decode.succeed JsonPhoto
-        |> required "title"          string
-        |> required "size"           int
-        |> required "related_photos" (list string)
-
-
-finishPhoto : ( String, JsonPhoto ) -> ( String, Photo )
-finishPhoto ( url, json ) =
-    ( url
-    , { url         = url
-      , size        = json.size
-      , title       = json.title
-      , relatedUrls = json.relatedUrls
-      }
-    )
-
-
-fromPairs : List ( String, JsonPhoto ) -> Dict String Photo
-fromPairs pairs =
-    pairs
-        |> List.map finishPhoto
-        |> Dict.fromList
-
-
-photosDecoder : Decoder (Dict String Photo)
-photosDecoder =
-    Decode.keyValuePairs jsonPhotoDecoder
-        |> Decode.map fromPairs
-
-
-folderDecoder : Decoder Folder
-folderDecoder =
-    Decode.succeed folderFromJson
-        |> required "name" string
-        |> required "photos" photosDecoder
-        |> required "subfolders" (Decode.lazy (\_ -> list folderDecoder))
-
-
-folderFromJson : String -> Dict String Photo -> List Folder -> Folder
-folderFromJson name photos subfolders =
-    Folder
-        { name       = name
-        , expanded   = True
-        , subfolders = subfolders
-        , photoUrls  = Dict.keys photos
-        }
-
-
-modelDecoder : Decoder Model
-modelDecoder =
-    Decode.map2
-        (\photos root ->
-            { photos = photos, root = root, selectedPhotoUrl = Nothing }
-        )
-        modelPhotosDecoder
-        folderDecoder
-
-
-modelPhotosDecoder : Decoder (Dict String Photo)
-modelPhotosDecoder =
-    Decode.succeed modelPhotosFromJson
-        |> required "photos"     photosDecoder
-        |> required "subfolders" (Decode.lazy (\_ -> list modelPhotosDecoder))
-
-
-modelPhotosFromJson :
-    Dict String Photo
-    -> List (Dict String Photo)
-    -> Dict String Photo
-modelPhotosFromJson folderPhotos subfolderPhotos =
-    List.foldl Dict.union folderPhotos subfolderPhotos
