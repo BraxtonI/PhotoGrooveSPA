@@ -79,6 +79,7 @@ subscriptions model =
 view : Model -> Document Msg
 view model =
     let
+        folderView : Document Pages.PhotoFolders.Msg
         folderView =
             Pages.PhotoFolders.view model
 
@@ -90,14 +91,15 @@ view model =
                 Nothing ->
                     "Photo not found"
 
+        body : List (Element Pages.PhotoFolders.Msg)
         body =
             folderView.body
 
     in
     { title = title
     , body =
-        [ el
+       [ el
             []
-            ( text ("Replace with with folder body. This should display " ++ title))
-        ]
+            ( text ("Replace this with folder body. This should display " ++ title))
+        }
     }
