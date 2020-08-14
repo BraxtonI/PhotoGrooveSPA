@@ -9,7 +9,8 @@ module Shared exposing
     , urlPrefix
     )
 
-import Api.Folder           as Folder exposing (Folder(..), Model)
+import Api.Folder           as Folder exposing (Folder(..))
+import Api.Gallery          as Gallery
 import Browser.Navigation   exposing (Key)
 import Element              exposing (..)
 import Element.Region       as Region
@@ -32,12 +33,13 @@ type alias Model =
     , key           : Key
     , version       : Float
     , foldersModel  : Folder.Model
+    , galleryModel  : Gallery.Model
     }
 
 
 init : Float -> Url -> Key -> ( Model, Cmd Msg )
 init version url key =
-    ( Model url key version Folder.initialModel
+    ( Model url key version Folder.initialModel Gallery.initialModel
     , Cmd.none
     )
 
@@ -53,6 +55,7 @@ urlPrefix =
 
 type Msg
     = UpdateFolders Folder.Model
+    | UpdateGallery Gallery.Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,6 +63,9 @@ update msg model =
     case msg of
         UpdateFolders foldersModel ->
             ( { model | foldersModel = foldersModel }, Cmd.none )
+
+        UpdateGallery galleryModel ->
+            ( { model | galleryModel = galleryModel }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
