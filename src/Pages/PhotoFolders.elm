@@ -1,4 +1,4 @@
-module Pages.PhotoFolders exposing (Params, Model, Msg, page)
+module Pages.PhotoFolders exposing (Params, Model, Msg, page, init, view)
 
 import Api.Folder       exposing (Folder (..), modelDecoder)
 import Api.Photo        exposing (Photo)
@@ -6,7 +6,7 @@ import Dict             exposing (Dict)
 import Element          exposing (..)
 import Element.Events   as Events
 import Http
-import Shared           exposing (urlPrefix)
+import Shared           as Shared exposing (urlPrefix)
 import Spa.Document     exposing (Document)
 import Spa.Page         as Page exposing (Page)
 import Spa.Url          as Url exposing (Url)
@@ -44,12 +44,15 @@ init shared params =
             Api.Folder.initialModel
 
     in
-    ( initialModel
-    , Http.get
-        { url = "http://elm-in-action.com/folders/list"
-        , expect = Http.expectJson LoadPage modelDecoder
-        }
-    )
+    if shared.foldersModel == initialModel then
+        ( initialModel
+        , Http.get
+            { url = "http://elm-in-action.com/folders/list"
+            , expect = Http.expectJson LoadPage modelDecoder
+            }
+        )
+    else
+        load shared initialModel
 
 
 
@@ -80,12 +83,12 @@ update msg model =
 
 save : Model -> Shared.Model -> Shared.Model
 save model shared =
-    shared
+    Tuple.first (Shared.update (Shared.UpdateFolders model) shared)
 
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
-    ( model, Cmd.none )
+    ( shared.foldersModel, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

@@ -1,7 +1,7 @@
 module Shared exposing
     ( Flags
     , Model
-    , Msg
+    , Msg (..)
     , init
     , subscriptions
     , update
@@ -31,12 +31,13 @@ type alias Model =
     { url           : Url
     , key           : Key
     , version       : Float
+    , foldersModel  : Folder.Model
     }
 
 
 init : Float -> Url -> Key -> ( Model, Cmd Msg )
 init version url key =
-    ( Model url key version
+    ( Model url key version Folder.initialModel
     , Cmd.none
     )
 
@@ -51,14 +52,14 @@ urlPrefix =
 
 
 type Msg
-    = ReplaceMe
+    = UpdateFolders Folder.Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ReplaceMe ->
-            ( model, Cmd.none )
+        UpdateFolders foldersModel ->
+            ( { model | foldersModel = foldersModel }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
