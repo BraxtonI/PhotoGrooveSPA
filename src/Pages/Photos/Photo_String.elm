@@ -98,6 +98,6 @@ view model =
     , body =
         [ el
             []
-            ( text "Replace with with folder body.")
+            ( text ("Replace with with folder body. This should display " ++ title))
         ]
     }
