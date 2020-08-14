@@ -1,21 +1,10 @@
-module Pages.PhotoGallery exposing (Params, Model, Msg, page)
+module Pages.Photos.Photo_String exposing (Params, Model, Msg, page, init)
 
-import Api.Photo            exposing (Photo)
-import Element              exposing (..)
-import Element.Events       as Events
-import Element.Input        as Input
-import Html                 exposing (Html, div, canvas, label, input, node)
-import Html.Attributes      as Attr exposing (checked, id, name, type_)
-import Html.Events          exposing (on, onClick)
-import Http
-import Json.Decode          exposing (Decoder, at, string, int, float, list, succeed)
-import Json.Decode.Pipeline exposing (optional, required)
-import Random
-import Shared           exposing (urlPrefix)
-import Spa.Document     exposing (Document)
-import Spa.Page         as Page exposing (Page)
-import Spa.Url          as Url exposing (Url)
-import UI
+import Api.Folder   exposing (Model, initialModel)
+import Shared
+import Spa.Document exposing (Document)
+import Spa.Page as Page exposing (Page)
+import Spa.Url as Url exposing (Url)
 
 
 page : Page Params Model Msg
@@ -35,7 +24,7 @@ page =
 
 
 type alias Params =
-    ()
+    { photo : String }
 
 
 type alias Model =
@@ -83,6 +72,6 @@ subscriptions model =
 
 view : Model -> Document Msg
 view model =
-    { title = "Photo Gallery"
+    { title = "Photo_String"
     , body = []
     }

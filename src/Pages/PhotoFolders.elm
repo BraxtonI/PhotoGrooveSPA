@@ -6,7 +6,6 @@ import Dict             exposing (Dict)
 import Element          exposing (..)
 import Element.Events   as Events
 import Http
-import Json.Decode      as Decode exposing (Decoder)
 import Shared           exposing (urlPrefix)
 import Spa.Document     exposing (Document)
 import Spa.Page         as Page exposing (Page)
@@ -14,7 +13,7 @@ import Spa.Url          as Url exposing (Url)
 import UI
 
 
-page : Page Params Model Msg
+page : Page () Model Msg
 page =
     Page.application
         { init = init
@@ -35,28 +34,22 @@ type alias Params =
 
 
 type alias Model =
-    { selectedPhotoUrl : Maybe String
-    , photos           : Dict String Photo
-    , root             : Folder
-    }
+    Api.Folder.Model
 
 
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
-init shared { params } =
+init shared params =
     let
         initialModel =
             Api.Folder.initialModel
 
     in
-    if shared.foldersModel == initialModel then
-        ( initialModel
-        , Http.get
-            { url = "http://elm-in-action.com/folders/list"
-            , expect = Http.expectJson LoadPage modelDecoder
-            }
-        )
-    else
-        ( shared.foldersModel, Cmd.none )
+    ( initialModel
+    , Http.get
+        { url = "http://elm-in-action.com/folders/list"
+        , expect = Http.expectJson LoadPage modelDecoder
+        }
+    )
 
 
 

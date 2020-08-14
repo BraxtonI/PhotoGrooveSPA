@@ -9,7 +9,7 @@ import Spa.Generated.Route as Route exposing (Route)
 import Url exposing (Url)
 
 
-main : Program Flags Model Msg
+main : Program Float Model Msg
 main =
     Browser.application
         { init = init
@@ -31,11 +31,11 @@ type alias Model =
     }
 
 
-init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
+init : Float -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init version url key =
     let
         ( shared, sharedCmd ) =
-            Shared.init flags url key
+            Shared.init version url key
 
         ( page, pageCmd ) =
             Pages.init (fromUrl url) shared

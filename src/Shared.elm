@@ -11,7 +11,6 @@ module Shared exposing
 
 import Api.Folder           as Folder exposing (Folder(..), Model)
 import Browser.Navigation   exposing (Key)
-import Dict                 exposing (Dict)
 import Element              exposing (..)
 import Element.Region       as Region
 import Spa.Document         exposing (Document)
@@ -31,13 +30,13 @@ type alias Flags =
 type alias Model =
     { url           : Url
     , key           : Key
-    , foldersModel  : Folder.Model
+    , version       : Float
     }
 
 
-init : Flags -> Url -> Key -> ( Model, Cmd Msg )
-init flags url key =
-    ( Model url key Folder.initialModel
+init : Float -> Url -> Key -> ( Model, Cmd Msg )
+init version url key =
+    ( Model url key version
     , Cmd.none
     )
 
