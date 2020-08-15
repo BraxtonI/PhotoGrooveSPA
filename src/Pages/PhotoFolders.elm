@@ -1,4 +1,4 @@
-module Pages.PhotoFolders exposing (Params, Model, Msg, page, init, view)
+module Pages.PhotoFolders exposing (Params, Model, Msg, page, init, view, update)
 
 import Api.Folder       exposing (Folder (..), modelDecoder)
 import Api.Photo        exposing (Photo)
@@ -114,7 +114,7 @@ view model =
                     viewSelectedPhoto photo
 
                 Nothing ->
-                    text "Nothing!"
+                    text ""
     in
     { title = "Photo Folders"
     , body =

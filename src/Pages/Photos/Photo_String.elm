@@ -48,19 +48,30 @@ init shared { params } =
 
 
 type Msg
-    = ReplaceMe
+    = FromPhotoFolders Pages.PhotoFolders.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ReplaceMe ->
-            ( model, Cmd.none )
+        FromPhotoFolders newMsg ->
+            let
+                ( foldersModel, foldersCmd ) =
+                    Pages.PhotoFolders.update newMsg model
+
+            in
+            ( { model |
+                selectedPhotoUrl = foldersModel.selectedPhotoUrl
+                , photos         = foldersModel.photos
+                , root           = foldersModel.root
+              }
+            , Cmd.map FromPhotoFolders foldersCmd
+            )
 
 
 save : Model -> Shared.Model -> Shared.Model
 save model shared =
-    shared
+    Tuple.first (Shared.update (Shared.UpdateFolders model) shared)
 
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
@@ -91,16 +102,22 @@ view model =
                 Nothing ->
                     "Photo not found"
 
+        folderElement : List (Element Pages.PhotoFolders.Msg) -> Element Pages.PhotoFolders.Msg
+        folderElement list =
+            case List.head list of
+                 Just newElement ->
+                     newElement
 
+                 Nothing ->
+                     el
+                        []
+                        ( text "Nothing here" )
+
+        body : Element Msg
         body =
-            folderView.body
+            Element.map FromPhotoFolders (folderElement folderView.body)
 
     in
-    { title = title
-    , body = --body
---
-        [ el
-            []
-            ( text ("Replace this with folder body. This should display " ++ title))
-        ]--}
+    { title = folderView.title ++ " - " ++ title
+    , body = [ body ]
     }
