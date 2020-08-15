@@ -102,6 +102,7 @@ view { page, toMsg } model =
                     (text "Photo Groove")
                 , navLink Route.PhotoFolders "Photo Folders"
                 , navLink Route.PhotoGallery "Photo Gallery"
+                , navLink (Route.Photo2__Something_String { something = "nothing" }) "Test Link"
                 ]
             , column
                 []

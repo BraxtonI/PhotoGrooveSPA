@@ -1,19 +1,21 @@
-module Pages.PhotoFolders exposing (Params, Model, Msg, page, init, view)
+module Pages.Photo2.Something_String exposing (Params, Model, Msg, page)
 
-import Api.Folder       exposing (Folder (..), modelDecoder)
+import Api.Folder           exposing (Model, initialModel)
+import Element              exposing (..)
+import Element.Events   as Events
+import Pages.PhotoFolders
+import Shared               exposing (urlPrefix)
+import Spa.Document         exposing (Document)
+import Spa.Page             as Page exposing (Page)
+import Spa.Url              as Url exposing (Url)
 import Api.Photo        exposing (Photo)
 import Dict             exposing (Dict)
-import Element          exposing (..)
-import Element.Events   as Events
-import Http
-import Shared           as Shared exposing (urlPrefix)
-import Spa.Document     exposing (Document)
-import Spa.Page         as Page exposing (Page)
-import Spa.Url          as Url exposing (Url)
 import UI
+import Api.Folder       exposing (Folder (..), modelDecoder)
+import Http
 
 
-page : Page () Model Msg
+page : Page Params Model Msg
 page =
     Page.application
         { init = init
@@ -30,7 +32,7 @@ page =
 
 
 type alias Params =
-    ()
+    { something : String }
 
 
 type alias Model =
@@ -38,10 +40,13 @@ type alias Model =
 
 
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
-init shared params =
+init shared { params } =
     let
         initialModel =
             Api.Folder.initialModel
+
+        ( newModel, cmds ) =
+            load shared initialModel
 
     in
     if shared.foldersModel == initialModel then
@@ -52,7 +57,7 @@ init shared params =
             }
         )
     else
-        load shared initialModel
+        ( { newModel | selectedPhotoUrl = Just params.something } ,cmds )
 
 
 
@@ -137,7 +142,7 @@ viewPhoto url =
         ( UI.photo
         ++ [ Events.onClick (SelectPhotoUrl url) ]
         )
-        { url = ("/photos/" ++ url)
+        { url = ("/photo2/" ++ url)
         , label = text url }
 
 
@@ -172,7 +177,7 @@ viewRelatedPhoto : String -> Element Msg
 viewRelatedPhoto url =
     link
         (List.append UI.relatedPhoto [ Events.onClick (SelectPhotoUrl url) ])
-        { url = ("/photos/" ++ url)
+        { url = ("/photo2/" ++ url)
         , label =
             ( image
                 []

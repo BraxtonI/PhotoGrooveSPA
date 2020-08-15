@@ -91,15 +91,16 @@ view model =
                 Nothing ->
                     "Photo not found"
 
-        body : List (Element Pages.PhotoFolders.Msg)
+
         body =
             folderView.body
 
     in
     { title = title
-    , body =
-       [ el
+    , body = --body
+--
+        [ el
             []
             ( text ("Replace this with folder body. This should display " ++ title))
-        }
+        ]--}
     }
