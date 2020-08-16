@@ -86,7 +86,9 @@ view { page, toMsg } model =
         navLink : Route.Route -> String -> Element msg
         navLink url label =
             link
-                (UI.nav (isActive url page.title))
+                ((UI.nav (isActive url page.title))
+                ++ UI.hoverUnderline
+                )
                 { url = Route.toString url
                 , label = text label
                 }
@@ -104,7 +106,7 @@ view { page, toMsg } model =
                 , navLink Route.PhotoGallery "Photo Gallery"
                 ]
             , column
-                []
+                [ width fill ]
                 page.body
             , el
                 UI.footer

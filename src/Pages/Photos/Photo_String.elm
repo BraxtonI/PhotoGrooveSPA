@@ -6,7 +6,7 @@ import Pages.PhotoFolders
 import Shared
 import Spa.Document         exposing (Document)
 import Spa.Page             as Page exposing (Page)
-import Spa.Url              as Url exposing (Url)
+import Spa.Url              exposing (Url)
 
 
 page : Page Params Model Msg
@@ -37,7 +37,7 @@ init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared { params } =
     let
         ( model, cmds ) =
-            (load shared Api.Folder.initialModel)
+            (load shared initialModel)
 
     in
     ( { model | selectedPhotoUrl = Just params.photo }, cmds )

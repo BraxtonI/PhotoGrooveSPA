@@ -230,13 +230,6 @@ chosenSize =
     ]
 
 
-chosenSizeSpan : List (Attribute msg)
-chosenSizeSpan =
-    [ alignLeft
-    , paddingEach { edges | left = 10, right = 10 }
-    ]
-
-
 filterLabel : List (Attribute msg)
 filterLabel =
     [ width (px 70)

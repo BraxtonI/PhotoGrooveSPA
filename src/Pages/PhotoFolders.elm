@@ -1,6 +1,6 @@
 module Pages.PhotoFolders exposing (Params, Model, Msg, page, init, view, update)
 
-import Api.Folder       exposing (Folder (..), modelDecoder)
+import Api.Folder       exposing (Folder (..), modelDecoder, initialModel)
 import Api.Photo        exposing (Photo)
 import Dict             exposing (Dict)
 import Element          exposing (..)
@@ -39,11 +39,6 @@ type alias Model =
 
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared params =
-    let
-        initialModel =
-            Api.Folder.initialModel
-
-    in
     if shared.foldersModel == initialModel then
         ( initialModel
         , Http.get

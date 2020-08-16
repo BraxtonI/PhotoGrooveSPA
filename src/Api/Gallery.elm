@@ -10,7 +10,7 @@ port module Api.Gallery exposing
     )
 
 import Api.Photo            exposing (Photo)
-import Json.Decode          exposing (Decoder, at, string, int, float, list, succeed)
+import Json.Decode          exposing (Decoder, string, int, list, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 
 

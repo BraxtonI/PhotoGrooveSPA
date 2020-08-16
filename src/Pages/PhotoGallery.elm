@@ -1,6 +1,6 @@
 module Pages.PhotoGallery exposing (Params, Model, Msg, page)
 
-import Api.Gallery          exposing
+import Api.Gallery      exposing
     ( Model
     , initialModel
     , ThumbnailSize(..)
@@ -10,20 +10,20 @@ import Api.Gallery          exposing
     , setFilters
     , photoDecoder
     )
-import Api.Photo            exposing (Photo)
-import Element              exposing (..)
-import Element.Events       as Events
-import Element.Input        as Input
-import Html                 exposing (Html, div, canvas, label, input, node)
-import Html.Attributes      as Attr exposing (checked, id, name, type_)
-import Html.Events          exposing (on, onClick)
+import Api.Photo        exposing (Photo)
+import Element          exposing (..)
+import Element.Events   as Events
+import Element.Input    as Input
+import Html             exposing (Html, canvas, label, input)
+import Html.Attributes  exposing (checked, id, name, type_)
+import Html.Events      exposing (on, onClick)
 import Http
-import Json.Decode          exposing (Decoder, at, string, int, float, list, succeed)
+import Json.Decode      exposing (Decoder, at, float, list)
 import Random
 import Shared           exposing (urlPrefix)
 import Spa.Document     exposing (Document)
 import Spa.Page         as Page exposing (Page)
-import Spa.Url          as Url exposing (Url)
+import Spa.Url          exposing (Url)
 import UI
 
 
