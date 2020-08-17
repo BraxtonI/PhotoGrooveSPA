@@ -46,7 +46,7 @@ init version url key =
 
 urlPrefix : String
 urlPrefix =
-    "http://elm-in-action.com/"
+    "https://elm-in-action.com/"
 
 
 
