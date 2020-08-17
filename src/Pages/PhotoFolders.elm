@@ -42,7 +42,7 @@ init shared params =
     if shared.foldersModel == initialModel then
         ( initialModel
         , Http.get
-            { url = "http://elm-in-action.com/folders/list"
+            { url = "https://elm-in-action.com/folders/list"
             , expect = Http.expectJson LoadPage modelDecoder
             }
         )
