@@ -26,7 +26,11 @@ toBrowserDocument : Document msg -> Browser.Document msg
 toBrowserDocument doc =
     { title = doc.title
     , body =
-        [ Element.layout UI.body
-            (column [ width fill, height fill ] doc.body)
+        [ Element.layout
+            UI.body
+            (column
+                [ width fill, height fill ]
+                doc.body
+            )
         ]
     }

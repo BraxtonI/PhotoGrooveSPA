@@ -1,12 +1,13 @@
 module Main exposing (main)
 
 import Browser
-import Browser.Navigation as Nav
-import Shared exposing (Flags)
-import Spa.Document as Document exposing (Document)
-import Spa.Generated.Pages as Pages
-import Spa.Generated.Route as Route exposing (Route)
-import Url exposing (Url)
+import Browser.Navigation   as Nav
+import Api.LocalState
+import Shared               exposing (Flags)
+import Spa.Document         as Document exposing (Document)
+import Spa.Generated.Pages  as Pages
+import Spa.Generated.Route  as Route exposing (Route)
+import Url                  exposing (Url)
 
 
 main : Program Float Model Msg
@@ -99,6 +100,7 @@ update msg model =
             , Cmd.batch
                 [ Cmd.map Shared sharedCmd
                 , Cmd.map Pages pageCmd
+                , Api.LocalState.saveState model.shared
                 ]
             )
 
