@@ -100,7 +100,6 @@ update msg model =
             , Cmd.batch
                 [ Cmd.map Shared sharedCmd
                 , Cmd.map Pages pageCmd
-                , Api.LocalState.saveState model.shared
                 ]
             )
 
@@ -113,7 +112,10 @@ update msg model =
                     Pages.save page model.shared
             in
             ( { model | page = page, shared = shared }
-            , Cmd.map Pages pageCmd
+            , Cmd.batch
+                [ Cmd.map Pages pageCmd
+                , Api.LocalState.saveState model.shared
+                ]
             )
 
 
