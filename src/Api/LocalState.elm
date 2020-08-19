@@ -71,13 +71,3 @@ encodeGallery model =
         , ( "ripple", Encode.float model.ripple )
         , ( "noise", Encode.float model.noise )
         ]
-
-
-{--
-    Encode.object
-        [ ( "id", encodeId post.id )
-        , ( "title", Encode.string post.title )
-        , ( "authorName", Encode.string post.authorName )
-        , ( "authorUrl", Encode.string post.authorUrl )
-        ]
---}
