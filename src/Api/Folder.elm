@@ -3,7 +3,7 @@ module Api.Folder exposing (Folder (..), Model, initialModel, modelDecoder)
 import Api.Photo            exposing (Photo)
 import Dict                 exposing (Dict)
 import Json.Decode          as Decode exposing (Decoder, int, list, string)
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline exposing (hardcoded, required)
 
 
 type alias Model =
@@ -81,15 +81,16 @@ folderDecoder =
         |> required "name" string
         |> required "photos" photosDecoder
         |> required "subfolders" (Decode.lazy (\_ -> list folderDecoder))
+        |> hardcoded True
 
 
-folderFromJson : String -> Dict String Photo -> List Folder -> Folder
-folderFromJson name photos subfolders =
+folderFromJson : String -> Dict String Photo -> List Folder -> Bool -> Folder
+folderFromJson name photos subfolders expanded =
     Folder
         { name       = name
-        , expanded   = True
-        , subfolders = subfolders
         , photoUrls  = Dict.keys photos
+        , subfolders = subfolders
+        , expanded   = expanded
         }
 
 

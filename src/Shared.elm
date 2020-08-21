@@ -30,6 +30,7 @@ type alias Flags =
 
 type alias Model =
     { url           : Url
+    , loaded        : String
     , key           : Key
     , version       : Float
     , foldersModel  : Folder.Model
@@ -39,7 +40,7 @@ type alias Model =
 
 init : Float -> Url -> Key -> ( Model, Cmd Msg )
 init version url key =
-    ( Model url key version Folder.initialModel Gallery.initialModel
+    ( Model url "init" key version Folder.initialModel Gallery.initialModel
     , Cmd.none
     )
 

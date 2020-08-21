@@ -42,12 +42,20 @@
         <script src="https://elm-in-action.com/pasta.js"></script>
         <script src="/main.js"></script>
         <script>
-            var app = Elm.Main.init({node: document.getElementById("app"), flags: Pasta.version})
+            var storedState = localStorage.getItem('state-save');
+            console.log("Retrieved state: ", storedState);
+            var startingState = storedState ? JSON.parse(storedState) : null;
+
+            var allFlags = { version: Pasta.version, initState: startingState };
+
+            var app = Elm.Main.init({node: document.getElementById("app"), flags: allFlags})
+
             app.ports.setFilters.subscribe(function(options) {
                 requestAnimationFrame(function() {
                     Pasta.apply(document.getElementById("main-canvas"), options);
                 });
             })
+
             Pasta.addActivityListener(function(activity) {
                 console.log("Got some activity to send to Elm:", activity);
                 app.ports.activityChanges.send(activity);
@@ -57,6 +65,14 @@
                 if (state.length > 0) {
                     var stateJson = JSON.stringify(state);
                     localStorage.setItem('state-save', stateJson);
+                    console.log("Saved state: ", stateJson);
+                }
+            });
+
+            app.ports.storeState2.subscribe(function(state) {
+                if (state.length > 0) {
+                    var stateJson = JSON.stringify(state);
+                    localStorage.setItem('state-save2', stateJson);
                     console.log("Saved state: ", stateJson);
                 }
             });

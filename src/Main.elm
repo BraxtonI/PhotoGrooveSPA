@@ -1,8 +1,9 @@
 module Main exposing (main)
 
+import Api.LocalState
 import Browser
 import Browser.Navigation   as Nav
-import Api.LocalState
+import Json.Decode          as Decode
 import Shared               exposing (Flags)
 import Spa.Document         as Document exposing (Document)
 import Spa.Generated.Pages  as Pages
@@ -10,7 +11,7 @@ import Spa.Generated.Route  as Route exposing (Route)
 import Url                  exposing (Url)
 
 
-main : Program Float Model Msg
+main : Program Flags Model Msg
 main =
     Browser.application
         { init = init
@@ -26,25 +27,53 @@ main =
 -- INIT
 
 
+
+type alias Flags =
+    { version: Float
+    , initState : Maybe String
+    }
+
+
 type alias Model =
     { shared : Shared.Model
     , page : Pages.Model
     }
 
 
-init : Float -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init version url key =
+init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
     let
+        { version, initState } =
+            flags
+
         ( shared, sharedCmd ) =
             Shared.init version url key
 
         ( page, pageCmd ) =
             Pages.init (fromUrl url) shared
+
+        jsonString =
+            case initState of
+                Just newString ->
+                    newString
+
+                Nothing ->
+                    ""
+
+        loadedShared : Shared.Model
+        loadedShared =
+            case Decode.decodeString (Api.LocalState.decodeState shared) jsonString of
+                Ok newState ->
+                    Debug.log "The contents of the new state are: " newState
+
+                Err _ ->
+                    shared
+
     in
-    ( Model shared page
+    ( Model loadedShared (Debug.log "page's contents are: " page)
     , Cmd.batch
-        [ Cmd.map Shared sharedCmd
-        , Cmd.map Pages pageCmd
+        [ Cmd.map Shared (Debug.log "sharedCmd is: " sharedCmd)
+        , Cmd.map Pages (Debug.log "pageCmd is: " pageCmd)
         ]
     )
 
