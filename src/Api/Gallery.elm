@@ -19,6 +19,7 @@ type alias Model =
     { status     : Status
     , activity   : String
     , chosenSize : ThumbnailSize
+    , chosenUrl  : String
     , hue        : Float
     , ripple     : Float
     , noise      : Float
@@ -30,6 +31,7 @@ initialModel =
     { status     = Loading
     , activity   = ""
     , chosenSize = Medium
+    , chosenUrl  = ""
     , hue        = 5
     , ripple     = 5
     , noise      = 5
@@ -51,7 +53,7 @@ sizeToString size =
 
 type Status
     = Loading
-    | Loaded  (List Photo) String
+    | Loaded  (List Photo)
     | Errored String
 
 

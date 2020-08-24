@@ -28,7 +28,7 @@ encodeState model =
 
 decodeState : Shared.Model -> Decoder Shared.Model
 decodeState shared =
-    Decode.succeed (Shared.Model shared.url "state" shared.key shared.version False)
+    Decode.succeed (Shared.Model shared.url "state" shared.key shared.version)
         |> required "foldersModel" (decodeFolders shared.foldersModel)
         |> required "galleryModel" (decodeGallery shared.galleryModel)
 
@@ -105,6 +105,7 @@ encodeGallery model =
     Encode.object
         [ ( "activity", Encode.string model.activity )
         , ( "chosenSize", Encode.string size )
+        , ( "chosenUrl", Encode.string model.chosenUrl )
         , ( "hue", Encode.float model.hue )
         , ( "ripple", Encode.float model.ripple )
         , ( "noise", Encode.float model.noise )
@@ -116,6 +117,7 @@ decodeGallery model =
     Decode.succeed (Gallery.Model model.status)
         |> required "activity" Decode.string
         |> required "chosenSize" sizeDecoder
+        |> required "chosenUrl" Decode.string
         |> required "hue" Decode.float
         |> required "ripple" Decode.float
         |> required "noise" Decode.float

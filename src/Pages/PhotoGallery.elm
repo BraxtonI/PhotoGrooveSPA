@@ -85,22 +85,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotRandomPhoto photo ->
-            applyFilters { model | status = selectUrl photo.url model.status }
+            applyFilters { model | chosenUrl = photo.url }
 
         ClickedPhoto url ->
-            applyFilters { model | status = selectUrl url model.status }
+            applyFilters { model | chosenUrl = url }
 
         ClickedSize size ->
             ( { model | chosenSize = size }, Cmd.none )
 
         ClickedSurpriseMe ->
             case model.status of
-                Loaded (firstPhoto :: otherPhotos) _ ->
+                Loaded (firstPhoto :: otherPhotos) ->
                     Random.uniform firstPhoto otherPhotos
                         |> Random.generate GotRandomPhoto
                         |> Tuple.pair model
 
-                Loaded [] _ ->
+                Loaded [] ->
                     ( model, Cmd.none )
 
                 Loading ->
@@ -115,13 +115,19 @@ update msg model =
         GotPhotos (Ok photos) ->
             applyFilters
                 { model
-                    | status =
-                        case photos of
-                            first :: rest ->
-                                Loaded photos first.url
+                    | status = Loaded photos
+                    , chosenUrl =
+                        case model.chosenUrl of
+                            "" ->
+                                case photos of
+                                    first :: rest ->
+                                        first.url
 
-                            [] ->
-                                Loaded [] ""
+                                    [] ->
+                                        ""
+
+                            _ ->
+                                model.chosenUrl
                 }
 
         GotPhotos (Err httpError) ->
@@ -150,7 +156,7 @@ load shared model =
     if shared.galleryModel.status == Loading then
         -- if galleryModel has been stored in shared, but status is loading
         -- then it has been loaded from Json while on a different page
-        --and the status needs to be reset by using initialCmd
+        -- and the status needs to be reset by using initialCmd
         ( (Debug.log "The gallery model has been loaded from JSON with: " shared.galleryModel), initialCmd )
     else
         update ReloadCanvas shared.galleryModel
@@ -172,7 +178,7 @@ initialCmd =
 applyFilters : Model -> ( Model, Cmd Msg )
 applyFilters model =
     case model.status of
-        Loaded photos selectedUrl ->
+        Loaded photos ->
             let
                 filters =
                     [ { name = "Hue",    amount = model.hue    / 11 }
@@ -181,7 +187,7 @@ applyFilters model =
                     ]
 
                 url =
-                    urlPrefix ++ "large/" ++ selectedUrl
+                    urlPrefix ++ "large/" ++ model.chosenUrl
             in
             ( model, setFilters { url = url, filters = filters } )
 
@@ -190,19 +196,6 @@ applyFilters model =
 
         Errored errorMessage ->
             ( model, Cmd.none )
-
-
-selectUrl : String -> Status -> Status
-selectUrl url status =
-    case status of
-        Loaded photos _ ->
-            Loaded photos url
-
-        Loading ->
-            status
-
-        Errored errorMessage ->
-            status
 
 
 viewFilter : (Float -> msg) -> String -> Float -> Element msg
@@ -255,8 +248,8 @@ view model =
     , body =
         [ row UI.photoGalleryContent <|
             case model.status of
-                Loaded photos selectedUrl ->
-                    viewLoaded photos selectedUrl model
+                Loaded photos ->
+                    viewLoaded photos model.chosenUrl model
 
                 Loading ->
                     []

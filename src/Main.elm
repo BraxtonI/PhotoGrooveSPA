@@ -49,8 +49,17 @@ init flags url key =
         ( shared, sharedCmd ) =
             Shared.init version url key
 
+        loadedShared : Shared.Model
+        loadedShared =
+            case Decode.decodeString (Api.LocalState.decodeState shared) jsonString of
+                Ok newState ->
+                    newState
+
+                Err _ ->
+                    shared
+
         ( page, pageCmd ) =
-            Pages.init (fromUrl url) shared
+            Pages.init (fromUrl url) loadedShared
 
         jsonString =
             case initState of
@@ -59,15 +68,6 @@ init flags url key =
 
                 Nothing ->
                     ""
-
-        loadedShared : Shared.Model
-        loadedShared =
-            case Decode.decodeString (Api.LocalState.decodeState shared) jsonString of
-                Ok newState ->
-                    Debug.log "The contents of the new state are: " { newState | loadingJson = True }
-
-                Err _ ->
-                    shared
 
         model =
             Model loadedShared (Debug.log "page's contents are: " page)
@@ -128,7 +128,7 @@ update msg model =
                 ( page, pageCmd ) =
                     Pages.load model.page shared
 
-                newModel =
+                {--newModel =
                     if shared.loadingJson then
                     let
                         newShared =
@@ -137,9 +137,10 @@ update msg model =
                     in
                         { model | page = page, shared = newShared }
                     else
-                        { model | page = page, shared = shared }
+
+                --}
             in
-            ( newModel
+            ( { model | page = page, shared = shared }
             , Cmd.batch
                 [ Cmd.map Shared sharedCmd
                 , Cmd.map Pages  pageCmd
@@ -153,6 +154,7 @@ update msg model =
 
                 shared =
                     Pages.save page model.shared
+
             in
             ( { model | page = page, shared = shared }
             , Cmd.batch
