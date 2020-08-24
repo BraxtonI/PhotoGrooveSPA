@@ -33,6 +33,7 @@ type alias Model =
     , loaded        : String
     , key           : Key
     , version       : Float
+    , loadingJson   : Bool
     , foldersModel  : Folder.Model
     , galleryModel  : Gallery.Model
     }
@@ -40,7 +41,7 @@ type alias Model =
 
 init : Float -> Url -> Key -> ( Model, Cmd Msg )
 init version url key =
-    ( Model url "init" key version Folder.initialModel Gallery.initialModel
+    ( Model url "init" key version False Folder.initialModel Gallery.initialModel
     , Cmd.none
     )
 
@@ -57,6 +58,7 @@ urlPrefix =
 type Msg
     = UpdateFolders Folder.Model
     | UpdateGallery Gallery.Model
+    | JsonLoaded
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -67,6 +69,9 @@ update msg model =
 
         UpdateGallery galleryModel ->
             ( { model | galleryModel = galleryModel }, Cmd.none )
+
+        JsonLoaded ->
+            ( { model | loadingJson = False }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

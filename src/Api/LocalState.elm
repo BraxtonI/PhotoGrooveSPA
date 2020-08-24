@@ -28,7 +28,7 @@ encodeState model =
 
 decodeState : Shared.Model -> Decoder Shared.Model
 decodeState shared =
-    Decode.succeed (Shared.Model shared.url "state" shared.key shared.version)
+    Decode.succeed (Shared.Model shared.url "state" shared.key shared.version False)
         |> required "foldersModel" (decodeFolders shared.foldersModel)
         |> required "galleryModel" (decodeGallery shared.galleryModel)
 

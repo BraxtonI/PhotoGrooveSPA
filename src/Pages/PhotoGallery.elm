@@ -147,7 +147,18 @@ save model shared =
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
-    update ReloadCanvas shared.galleryModel
+    if shared.galleryModel.status == Loading then
+        -- if galleryModel has been stored in shared, but status is loading
+        -- then it has been loaded from Json while on a different page
+        --and the status needs to be reset by using initialCmd
+        ( (Debug.log "The gallery model has been loaded from JSON with: " shared.galleryModel), initialCmd )
+    else
+        update ReloadCanvas shared.galleryModel
+
+
+reload : Model -> (Model, Cmd Msg)
+reload newModel =
+    applyFilters newModel
 
 
 initialCmd : Cmd Msg
@@ -192,11 +203,6 @@ selectUrl url status =
 
         Errored errorMessage ->
             status
-
-
-reload : Model -> (Model, Cmd Msg)
-reload newModel =
-    applyFilters newModel
 
 
 viewFilter : (Float -> msg) -> String -> Float -> Element msg

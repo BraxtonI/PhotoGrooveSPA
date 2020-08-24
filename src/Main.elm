@@ -14,12 +14,12 @@ import Url                  exposing (Url)
 main : Program Flags Model Msg
 main =
     Browser.application
-        { init = init
-        , update = update
+        { init          = init
+        , update        = update
         , subscriptions = subscriptions
-        , view = view >> Document.toBrowserDocument
-        , onUrlRequest = LinkClicked
-        , onUrlChange = UrlChanged
+        , view          = view >> Document.toBrowserDocument
+        , onUrlRequest  = LinkClicked
+        , onUrlChange   = UrlChanged
         }
 
 
@@ -29,14 +29,14 @@ main =
 
 
 type alias Flags =
-    { version: Float
+    { version   : Float
     , initState : Maybe String
     }
 
 
 type alias Model =
     { shared : Shared.Model
-    , page : Pages.Model
+    , page   : Pages.Model
     }
 
 
@@ -64,16 +64,19 @@ init flags url key =
         loadedShared =
             case Decode.decodeString (Api.LocalState.decodeState shared) jsonString of
                 Ok newState ->
-                    Debug.log "The contents of the new state are: " newState
+                    Debug.log "The contents of the new state are: " { newState | loadingJson = True }
 
                 Err _ ->
                     shared
 
+        model =
+            Model loadedShared (Debug.log "page's contents are: " page)
+
     in
-    ( Model loadedShared (Debug.log "page's contents are: " page)
+    ( model
     , Cmd.batch
-        [ Cmd.map Shared (Debug.log "sharedCmd is: " sharedCmd)
-        , Cmd.map Pages (Debug.log "pageCmd is: " pageCmd)
+        [ Cmd.map Shared sharedCmd
+        , Cmd.map Pages  pageCmd
         ]
     )
 
@@ -84,9 +87,9 @@ init flags url key =
 
 type Msg
     = LinkClicked Browser.UrlRequest
-    | UrlChanged Url
-    | Shared Shared.Msg
-    | Pages Pages.Msg
+    | UrlChanged  Url
+    | Shared      Shared.Msg
+    | Pages       Pages.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -124,11 +127,22 @@ update msg model =
 
                 ( page, pageCmd ) =
                     Pages.load model.page shared
+
+                newModel =
+                    if shared.loadingJson then
+                    let
+                        newShared =
+                            { shared | loadingJson = False }
+
+                    in
+                        { model | page = page, shared = newShared }
+                    else
+                        { model | page = page, shared = shared }
             in
-            ( { model | page = page, shared = shared }
+            ( newModel
             , Cmd.batch
                 [ Cmd.map Shared sharedCmd
-                , Cmd.map Pages pageCmd
+                , Cmd.map Pages  pageCmd
                 ]
             )
 

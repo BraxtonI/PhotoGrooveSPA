@@ -68,14 +68,6 @@
                     console.log("Saved state: ", stateJson);
                 }
             });
-
-            app.ports.storeState2.subscribe(function(state) {
-                if (state.length > 0) {
-                    var stateJson = JSON.stringify(state);
-                    localStorage.setItem('state-save2', stateJson);
-                    console.log("Saved state: ", stateJson);
-                }
-            });
         </script>
     </body>
 </html>

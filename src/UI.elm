@@ -48,8 +48,8 @@ body =
         [ Font.typeface "Verdana" ]
     , Background.color  backgroundColor
     , Font.color        fontColor
-    , width fill
-    , height fill
+    , width             fill
+    , height            fill
     ]
 
 
@@ -101,8 +101,8 @@ nav active =
 hoverUnderline : List (Attribute msg)
 hoverUnderline =
     [ Border.widthEach { edges | bottom = 2 }
-    , Border.color   backgroundColor
-    , mouseOver      [ Border.color white ]
+    , Border.color     backgroundColor
+    , mouseOver        [ Border.color white ]
     ]
 
 
@@ -190,7 +190,7 @@ activity =
 photoGalleryContent : List (Attribute msg)
 photoGalleryContent =
     [ paddingEach { edges | top = 40 }
-    , width (px 960)
+    , width       (px 960)
     , centerX
     ]
 
@@ -232,7 +232,7 @@ chosenSize =
 
 filterLabel : List (Attribute msg)
 filterLabel =
-    [ width (px 70)
+    [ width       (px 70)
     , paddingEach { edges | top = 5 }
     ]
 
@@ -245,8 +245,8 @@ filterSlider =
 
 slider : List (Attribute msg)
 slider =
-    [ width (px 120)
-    , height (px 2)
+    [ width            (px 120)
+    , height           (px 2)
     , Background.color white
     ]
 
@@ -260,12 +260,12 @@ sliderWrapper =
 thumb : Input.Thumb
 thumb =
     Input.thumb
-        [ Element.width (px 16)
-        , Element.height (px 16)
-        , Border.rounded 8
-        , Border.width 1
-        , Border.color (rgb 0.6 0.6 0.6)
-        , Background.color (rgb 0.6 0.6 0.6)
+        [ Element.width     (px 16)
+        , Element.height    (px 16)
+        , Border.rounded    8
+        , Border.width      1
+        , Border.color      (rgb 0.6 0.6 0.6)
+        , Background.color  (rgb 0.6 0.6 0.6)
         , focused
             [ Background.color blue ]
         ]
