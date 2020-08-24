@@ -42,10 +42,8 @@ encodeFolders model =
             case model.selectedPhotoUrl of
                 Just photoUrl ->
                     photoUrl
-
                 Nothing ->
                     ""
-
     in--}
     Encode.object
         [ --( "selectedPhotoUrl", Encode.string url )

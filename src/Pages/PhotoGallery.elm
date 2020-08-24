@@ -157,7 +157,7 @@ load shared model =
         -- if galleryModel has been stored in shared, but status is loading
         -- then it has been loaded from Json while on a different page
         -- and the status needs to be reset by using initialCmd
-        ( (Debug.log "The gallery model has been loaded from JSON with: " shared.galleryModel), initialCmd )
+        ( shared.galleryModel, initialCmd )
     else
         update ReloadCanvas shared.galleryModel
 

@@ -70,7 +70,7 @@ init flags url key =
                     ""
 
         model =
-            Model loadedShared (Debug.log "page's contents are: " page)
+            Model loadedShared page
 
     in
     ( model
