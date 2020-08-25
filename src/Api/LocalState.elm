@@ -2,8 +2,9 @@ port module Api.LocalState exposing (saveState, decodeState)
 
 import Shared
 import Json.Decode          as Decode  exposing (Decoder)
-import Json.Decode.Pipeline            exposing (hardcoded, required)
+import Json.Decode.Pipeline            exposing (hardcoded, required, optional)
 import Json.Encode          as Encode
+import Json.Encode.Extra    as EncodeExtra
 import Api.Folder           as Folder  exposing (Folder(..))
 import Api.Gallery          as Gallery exposing (ThumbnailSize(..), sizeToString)
 
@@ -35,52 +36,37 @@ decodeState shared =
 
 encodeFolders : Folder.Model -> Encode.Value
 encodeFolders model =
-    {-- If you want to include URL in the saved state, uncomment this.
-    -- Make sure you also build the decoder in the next function as well.
-    let
-        url =
-            case model.selectedPhotoUrl of
-                Just photoUrl ->
-                    photoUrl
-                Nothing ->
-                    ""
-    in--}
     Encode.object
-        [ --( "selectedPhotoUrl", Encode.string url )
-        ( "root", encodeFolderHierarchy model.root )
+        [ ( "selectedPhotoUrl", EncodeExtra.maybe Encode.string model.selectedPhotoUrl )
+        , ( "root", encodeFolderHierarchy model.root )
         ]
 
 
 decodeFolders : Folder.Model -> Decoder Folder.Model
-decodeFolders folders =
+decodeFolders model =
     Decode.succeed Folder.Model
-        --|> required "selectedPhotoUrl" Decode.string
-        |> hardcoded folders.selectedPhotoUrl
-        |> hardcoded folders.photos
-        |> required "root" (decodeFolderRoot folders.root)
+        |> optional "selectedPhotoUrl" (Decode.map Just Decode.string) Nothing
+        |> hardcoded model.photos
+        |> required "root" decodeFolderRoot
 
 
 encodeFolderHierarchy : Folder -> Encode.Value
 encodeFolderHierarchy (Folder folder) =
     Encode.object
-        [ ( "expanded", Encode.bool folder.expanded )
+        [ ( "name", Encode.string folder.name )
+        , ( "photoUrls", Encode.list Encode.string folder.photoUrls )
         , ( "subfolders", Encode.list encodeFolderHierarchy folder.subfolders )
+        , ( "expanded", Encode.bool folder.expanded )
         ]
 
 
-decodeFolderRoot : Folder -> Decoder Folder
-decodeFolderRoot (Folder folder) =
+decodeFolderRoot : Decoder Folder
+decodeFolderRoot =
     Decode.succeed folderFromJson
-        |> hardcoded folder.name
-        |> hardcoded folder.photoUrls
-        |> hardcoded folder.subfolders
-        --|> required "subfolders" Decode.list (decodeFolderList folder.subfolders)
+        |> required "name" Decode.string
+        |> required "photoUrls" (Decode.list Decode.string)
+        |> required "subfolders" (Decode.lazy (\_ -> Decode.list decodeFolderRoot))
         |> required "expanded" Decode.bool
-
-
-decodeFolderList : List Folder -> List (Decoder Folder)
-decodeFolderList folders =
-    List.map decodeFolderRoot folders
 
 
 folderFromJson : String -> List String -> List Folder -> Bool -> Folder

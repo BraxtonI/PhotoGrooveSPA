@@ -21,10 +21,10 @@ init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared params =
     let
         ( model, cmds ) =
-            Pages.PhotoFolders.init shared params
+            Pages.PhotoFolders.initFunction shared
 
     in
-    ( model, Cmd.map FromPhotoFolders cmds )
+    ( { model | selectedPhotoUrl = Nothing } , Cmd.map FromPhotoFolders cmds )
 
 
 page : Page Params Model Msg

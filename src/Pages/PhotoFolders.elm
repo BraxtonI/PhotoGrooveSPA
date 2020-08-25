@@ -1,16 +1,18 @@
-module Pages.PhotoFolders exposing (Params, Model, Msg, page, init, view, update)
+module Pages.PhotoFolders exposing (Params, Model, Msg, page, init, initFunction, view, update)
 
-import Api.Folder       exposing (Folder (..), modelDecoder, initialModel)
-import Api.Photo        exposing (Photo)
-import Dict             exposing (Dict)
-import Element          exposing (..)
-import Element.Events   as Events
+import Api.Folder          exposing (Folder (..), modelDecoder, initialModel)
+import Api.Photo           exposing (Photo)
+import Dict                exposing (Dict)
+import Element             exposing (..)
+import Element.Events      as Events
 import Http
-import Shared           as Shared exposing (urlPrefix)
-import Spa.Document     exposing (Document)
-import Spa.Page         as Page exposing (Page)
-import Spa.Url          as Url exposing (Url)
+import Spa.Generated.Route as Route
+import Shared              as Shared exposing (urlPrefix)
+import Spa.Document        exposing (Document)
+import Spa.Page            as Page exposing (Page)
+import Spa.Url             as Url exposing (Url)
 import UI
+import Utils.Route
 
 
 page : Page () Model Msg
@@ -39,15 +41,40 @@ type alias Model =
 
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared params =
-    if shared.foldersModel == initialModel then
-        ( initialModel
+    case shared.foldersModel.selectedPhotoUrl of
+        Just url ->
+            ( shared.foldersModel, Utils.Route.navigate params.key (Route.Photos__Photo_String { photo = url }) )
+
+        Nothing ->
+            ( shared.foldersModel, Utils.Route.navigate params.key Route.Top )
+
+
+initFunction : Shared.Model -> ( Model, Cmd Msg )
+initFunction shared =
+    let
+        ( loadedModel, loadedCmd ) =
+            load shared initialModel
+
+        loadedRoot =
+            getFolderType loadedModel.root
+
+    in
+    if loadedRoot.name == "Loading..." then
+        ( loadedModel
         , Http.get
-            { url = "https://elm-in-action.com/folders/list"
+            { url = urlPrefix ++ "folders/list"
             , expect = Http.expectJson LoadPage modelDecoder
             }
         )
+    else if loadedModel.photos == Dict.empty then
+        ( loadedModel
+        , Http.get
+            { url = urlPrefix ++ "folders/list"
+            , expect = Http.expectJson LoadPhotos modelDecoder
+            }
+        )
     else
-        load shared initialModel
+        ( loadedModel, loadedCmd )
 
 
 
@@ -57,6 +84,7 @@ init shared params =
 type Msg
     = SelectPhotoUrl String
     | LoadPage       (Result Http.Error Model)
+    | LoadPhotos     (Result Http.Error Model)
     | ToggleExpanded FolderPath
 
 
@@ -73,6 +101,12 @@ update msg model =
             ( { newModel | selectedPhotoUrl = model.selectedPhotoUrl }, Cmd.none )
 
         LoadPage (Err _) ->
+            ( model, Cmd.none )
+
+        LoadPhotos (Ok newModel) ->
+            ( { newModel | selectedPhotoUrl = model.selectedPhotoUrl, root = model.root }, Cmd.none )
+
+        LoadPhotos (Err _) ->
             ( model, Cmd.none )
 
 
@@ -260,3 +294,8 @@ toggleExpanded path (Folder folder) =
                         currentSubfolder
             in
             Folder { folder | subfolders = subfolders }
+
+
+getFolderType : Folder -> { name : String, photoUrls : List String, subfolders : List Folder, expanded : Bool }
+getFolderType (Folder folder) =
+    folder
